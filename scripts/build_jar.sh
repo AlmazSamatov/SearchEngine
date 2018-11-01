@@ -1,12 +1,14 @@
 if [ "$1" != "" ]; then
     echo "***Start building***"
-    rm -dr objects
-    mkdir objects
     for i_file in $1; do
         file="${i_file%.*}"
-	rm $file.jar
-        javac -d objects -cp $(hadoop classpath) $1 &&
-        jar -cvf $file.jar objects/$file*.class
+        res_dir=$file-objects
+        rm -dr $res_dir
+        mkdir $res_dir
+        cp $1 $res_dir/
+        cd $res_dir
+        javac -cp $(hadoop classpath) $1 &&
+        jar -cvf $file.jar $file*.class &&
 	echo "***Done***"
     done
 else
