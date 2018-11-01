@@ -12,7 +12,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class WordEnumerator {
-  private int wordCounter = 0;
+  private static int wordCounter = 0;
 
   public static class TokenizerMapper
        extends Mapper<Object, Text, Text, IntWritable>{
@@ -39,11 +39,6 @@ public class WordEnumerator {
     public void reduce(Text key, Iterable<IntWritable> values,
                        Context context
                        ) throws IOException, InterruptedException {
-      /*int sum = 0;
-      for (IntWritable val : values) {
-        sum += val.get();
-      }
-      result.set(sum);*/
       result.set(wordCounter++);
       context.write(key, result);
     }
