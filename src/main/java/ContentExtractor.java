@@ -37,9 +37,9 @@ public class ContentExtractor {
         // Initialize required items:
         Configuration configuration = new Configuration();
         FileSystem fileSystem = FileSystem.get(configuration);
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileSystem.open(new Path("hdfs:///EnWiki/AA_wiki_00"))));
+        String path = "hdfs:///EnWiki/AA_wiki_00";
 
-        try {
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileSystem.open(new Path(path))))) {
             String line;
             line = bufferedReader.readLine();
 
@@ -49,7 +49,7 @@ public class ContentExtractor {
                 // Parse JSON:
                 JSONObject jsonObject = (JSONObject) new JSONParser().parse(line);
 
-                int id = Integer.parseInt((String)jsonObject.get("id"));
+                int id = Integer.parseInt((String) jsonObject.get("id"));
                 String url = (String) jsonObject.get("url");
                 String title = (String) jsonObject.get("title");
 
@@ -63,16 +63,13 @@ public class ContentExtractor {
 
                 line = bufferedReader.readLine();
             }
-        } finally {
-            // close the BufferedReader:
-            bufferedReader.close();
         }
 
         StringBuilder response = new StringBuilder();
 
         // Convert list to string representing output response:
-        for (int i = 0; i < outputList.size(); i++) {
-            response.append(outputList.get(i));
+        for (String anOutputList : outputList) {
+            response.append(anOutputList);
             response.append("\n");
         }
 
