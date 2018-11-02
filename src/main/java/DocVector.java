@@ -24,8 +24,7 @@ public class DocVector implements Writable {
         docId = dataInput.readInt();
         String serializedVector = dataInput.readLine();
         Gson gson = new Gson();
-        vector = gson.fromJson(serializedVector, new TypeToken<Map<Integer, Double>>() {
-        }.getType());
+        vector = gson.fromJson(serializedVector, new TypeToken<Map<Integer, Double>>() {}.getType());
     }
 
     public int getDocId() {
