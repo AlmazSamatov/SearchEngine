@@ -35,4 +35,8 @@ public class VocabularyMaker {
             vocabulary.write(outputStream);
         }
     }
+
+    public static void main(String[] args) throws IOException {
+        mergeResults(args[0], args[1], args[2]);
+    }
 }
