@@ -6,13 +6,12 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import java.io.IOException;
-import java.util.StringTokenizer;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.StringTokenizer;
 
 public class DocumentCounter {
     public static HashMap<String, Integer> docIds = new HashMap<String, Integer>();
@@ -25,8 +24,7 @@ public class DocumentCounter {
         private Text word = new Text();
         private IntWritable fileId = new IntWritable();
 
-        public void map(Object key, Text value, Context context
-        ) throws IOException, InterruptedException {
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             String fileName = ((FileSplit) context.getInputSplit()).getPath().getName();
             Integer docId = docIds.get(fileName);
             if (docId == null) {
@@ -40,7 +38,7 @@ public class DocumentCounter {
             while (itr.hasMoreTokens()) {
                 String token = itr.nextToken().toLowerCase();
                 token = token.replaceAll("[^\\w&&[^-]]", "");
-                
+
                 word.set(token);
                 context.write(word, fileId);
             }
@@ -57,7 +55,7 @@ public class DocumentCounter {
             // TODO: understand why everything works without set
             //HashSet<Integer> docsUsed = new HashSet<Integer>();
             int cnt = 0;
-            for (IntWritable val: values) {
+            for (IntWritable val : values) {
                 cnt++;
                 /*int v = val.get();
                 if (!docsUsed.contains(v)) {

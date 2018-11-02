@@ -20,8 +20,7 @@ public class WordEnumerator {
         private final static IntWritable one = new IntWritable(1);
         private Text word = new Text();
 
-        public void map(Object key, Text value, Context context
-        ) throws IOException, InterruptedException {
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             StringTokenizer itr = new StringTokenizer(value.toString());
             while (itr.hasMoreTokens()) {
                 String token = itr.nextToken().toLowerCase();
@@ -32,13 +31,10 @@ public class WordEnumerator {
         }
     }
 
-    public static class IntSumReducer
-            extends Reducer<Text, IntWritable, Text, IntWritable> {
+    public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         private IntWritable result = new IntWritable();
 
-        public void reduce(Text key, Iterable<IntWritable> values,
-                           Context context
-        ) throws IOException, InterruptedException {
+        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException{
             result.set(wordCounter++);
             context.write(key, result);
         }
