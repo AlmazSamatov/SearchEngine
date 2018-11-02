@@ -11,6 +11,11 @@ public class DocVector implements Writable {
     private int docId;
     private Map<Integer, Double> vector;
 
+    public DocVector(int id, Map<Integer, Double> wordMap) {
+        docId = id;
+        vector = wordMap;
+    }
+
     @Override
     public void write(DataOutput dataOutput) throws IOException {
         dataOutput.writeInt(docId);
