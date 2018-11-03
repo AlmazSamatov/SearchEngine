@@ -1,5 +1,6 @@
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
@@ -17,21 +18,27 @@ public class VocabularyMaker {
         Map<String, Integer> wordIds = new HashMap<>();
         Map<Integer, Integer> idf = new HashMap<>();
 
-        try (Scanner scanner = new Scanner(fileSystem.open(new Path(wordIdsDir)))) {
-            while (scanner.hasNext()) {
-                wordIds.put(scanner.next(), scanner.nextInt());
+        FileStatus[] fileStatus = fileSystem.listStatus(new Path("hdfs://home/team6/" + wordIdsDir));
+        for (FileStatus status : fileStatus) {
+            try (Scanner scanner = new Scanner(fileSystem.open(status.getPath()))) {
+                while (scanner.hasNext()) {
+                    wordIds.put(scanner.next(), scanner.nextInt());
+                }
             }
         }
 
-        try (Scanner scanner = new Scanner(fileSystem.open(new Path(idfDir)))) {
-            while (scanner.hasNext()) {
-                idf.put(scanner.nextInt(), scanner.nextInt());
+        fileStatus = fileSystem.listStatus(new Path("hdfs://home/team6/" + idfDir));
+        for (FileStatus status : fileStatus) {
+            try (Scanner scanner = new Scanner(fileSystem.open(status.getPath()))) {
+                while (scanner.hasNext()) {
+                    idf.put(scanner.nextInt(), scanner.nextInt());
+                }
             }
         }
 
         Vocabulary vocabulary = new Vocabulary(wordIds, idf);
 
-        try (FSDataOutputStream outputStream = fileSystem.create(new Path(pathToWrite))) {
+        try (FSDataOutputStream outputStream = fileSystem.create(new Path("hdfs://home/team6/" + pathToWrite))) {
             vocabulary.write(outputStream);
         }
     }
