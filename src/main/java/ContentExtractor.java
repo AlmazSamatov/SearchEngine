@@ -2,7 +2,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.*;
+import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.WritableComparator;
 import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
@@ -35,13 +36,13 @@ public class ContentExtractor {
         }
     }
 
-    public static class ContentExtractorMapper extends Mapper<Document, NullWritable, ContentExtractorResults, NullWritable> {
+    public static class ContentExtractorMapper extends Mapper<Document, NullWritable, Document, NullWritable> {
 
         @Override
         protected void map(Document key, NullWritable value, Context context) throws IOException, InterruptedException {
             Double relevance = results.get(key.getId());
             if (relevance != null) {
-                context.write(new ContentExtractorResults(key, relevance), NullWritable.get());
+                context.write(key, NullWritable.get());
             }
         }
     }
@@ -113,15 +114,15 @@ public class ContentExtractor {
 
     public static class ContentExtractorResultsComparator extends WritableComparator {
 
-        protected ContentExtractorResultsComparator(Class<? extends WritableComparable> keyClass) {
-            super(keyClass, true);
+        protected ContentExtractorResultsComparator() {
+            super(Document.class, true);
         }
 
         @Override
-        public int compare(WritableComparable a, WritableComparable b) {
-            ContentExtractorResults k1 = (ContentExtractorResults) a;
-            ContentExtractorResults k2 = (ContentExtractorResults) b;
-            return k1.compareTo(k2);
+        public int compare(Object a, Object b) {
+            Document d1 = (Document) a;
+            Document d2 = (Document) b;
+            return Double.compare(results.get(d1.getId()), results.get(d2.getId()));
         }
     }
 
@@ -135,8 +136,8 @@ public class ContentExtractor {
         job.setMapperClass(ContentExtractorMapper.class);
         job.setSortComparatorClass(ContentExtractorResultsComparator.class);
         job.setNumReduceTasks(0);
-        job.setOutputKeyClass(IntWritable.class);
-        job.setOutputValueClass(DoubleWritable.class);
+        job.setOutputKeyClass(Document.class);
+        job.setOutputValueClass(NullWritable.class);
         FileInputFormat.addInputPath(job, new Path(args[1]));
         FileOutputFormat.setOutputPath(job, new Path(args[2]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);

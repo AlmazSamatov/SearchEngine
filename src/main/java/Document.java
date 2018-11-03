@@ -1,20 +1,21 @@
-import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.WritableComparable;
 import org.json.JSONObject;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class Document implements Writable {
+public class Document implements WritableComparable<Document> {
 
     private int id;
     private String title = "";
     private String url = "";
     private String text = "";
 
-    Document() {}
+    Document() {
+    }
 
-    Document(JSONObject jsonObject){
+    Document(JSONObject jsonObject) {
         if (jsonObject.has("id"))
             id = jsonObject.getInt("id");
         if (jsonObject.has("title"))
@@ -71,5 +72,10 @@ public class Document implements Writable {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    @Override
+    public int compareTo(Document o) {
+        return 0;
     }
 }
