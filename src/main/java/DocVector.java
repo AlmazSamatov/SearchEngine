@@ -1,5 +1,4 @@
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.apache.hadoop.io.Writable;
 
 import java.io.DataInput;
@@ -11,7 +10,15 @@ public class DocVector implements Writable {
     private int docId;
     private Map<Integer, Double> vector;
 
-    DocVector() {}
+    DocVector() {
+    }
+
+    DocVector(String serializedDocVector) {
+        Gson gson = new Gson();
+        DocVector docVector = gson.fromJson(serializedDocVector, DocVector.class);
+        docId = docVector.docId;
+        vector = docVector.vector;
+    }
 
     DocVector(int id, Map<Integer, Double> wordMap) {
         docId = id;
@@ -20,18 +27,18 @@ public class DocVector implements Writable {
 
     @Override
     public void write(DataOutput dataOutput) throws IOException {
-        dataOutput.writeInt(docId);
         Gson gson = new Gson();
-        String serializedVector = gson.toJson(vector);
-        dataOutput.writeChars(serializedVector);
+        String serializedDocVector = gson.toJson(this);
+        dataOutput.writeUTF(serializedDocVector);
     }
 
     @Override
     public void readFields(DataInput dataInput) throws IOException {
-        docId = dataInput.readInt();
         String serializedVector = dataInput.readLine();
         Gson gson = new Gson();
-        vector = gson.fromJson(serializedVector, new TypeToken<Map<Integer, Double>>() {}.getType());
+        DocVector docVector = gson.fromJson(serializedVector, DocVector.class);
+        docId = docVector.docId;
+        vector = docVector.vector;
     }
 
     public int getDocId() {

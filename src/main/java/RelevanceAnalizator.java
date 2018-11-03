@@ -1,26 +1,22 @@
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.WritableComparable;
-import org.apache.hadoop.io.WritableComparator;
-import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 public class RelevanceAnalizator {
 
     private static Map<Integer, Double> queryVector;
 
-    public static class RelevanceMapper extends Mapper<DocVector, NullWritable, RelevanceResults, NullWritable> {
+    public static class RelevanceMapper extends Mapper<LongWritable, Text, RelevanceResults, NullWritable> {
 
-        public void map(DocVector docVector, NullWritable n, Context context) throws IOException, InterruptedException {
+        public void map(LongWritable offset, Text doc, Context context) throws IOException, InterruptedException {
+            DocVector docVector = new DocVector(doc.toString());
 
             for (Map.Entry<Integer, Double> entry : queryVector.entrySet()) {
 
@@ -33,70 +29,6 @@ public class RelevanceAnalizator {
                 context.write(new RelevanceResults(entry.getKey(), relevance), NullWritable.get());
             }
 
-        }
-    }
-
-    public class CustomInputFormat extends FileInputFormat<DocVector, NullWritable> {
-
-        @Override
-        protected boolean isSplitable(JobContext context, Path filename) {
-            return false;
-        }
-
-        @Override
-        public RecordReader<DocVector, NullWritable> createRecordReader(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException {
-            CustomRecordReader customRecordReader = new CustomRecordReader();
-            customRecordReader.initialize(inputSplit, taskAttemptContext);
-            return customRecordReader;
-        }
-    }
-
-    public class CustomRecordReader extends RecordReader<DocVector, NullWritable> {
-
-        private DocVector currentKey = new DocVector();
-        private FSDataInputStream inputStream;
-        private int initialSize = 0;
-
-        @Override
-        public void initialize(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException {
-            FileSplit split = (FileSplit) inputSplit;
-            Configuration job = taskAttemptContext.getConfiguration();
-
-            final Path file = split.getPath();
-            FileSystem fs = file.getFileSystem(job);
-            inputStream = fs.open(split.getPath());
-
-            initialSize = inputStream.available();
-        }
-
-        @Override
-        public boolean nextKeyValue() throws IOException {
-            if (inputStream.available() > 0) {
-                currentKey.readFields(inputStream);
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        @Override
-        public DocVector getCurrentKey() {
-            return currentKey;
-        }
-
-        @Override
-        public NullWritable getCurrentValue() {
-            return NullWritable.get();
-        }
-
-        @Override
-        public float getProgress() throws IOException {
-            return (initialSize - inputStream.available()) / initialSize;
-        }
-
-        @Override
-        public void close() throws IOException {
-            inputStream.close();
         }
     }
 
@@ -121,7 +53,6 @@ public class RelevanceAnalizator {
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "relevance analizator");
         job.setJarByClass(RelevanceAnalizator.class);
-        job.setInputFormatClass(CustomInputFormat.class);
         job.setMapperClass(RelevanceMapper.class);
         job.setSortComparatorClass(RelevanceResultsComparator.class);
         job.setNumReduceTasks(0);
