@@ -9,6 +9,8 @@ import org.apache.hadoop.io.WritableComparator;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.json.JSONObject;
 
@@ -77,7 +79,7 @@ public class ContentExtractor {
     }
 
     public static void main(String[] args) throws Exception {
-        readRelevanceResults(args[0]);
+        readRelevanceResults(args[args.length - 1]);
 
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "content extractor");
@@ -87,8 +89,10 @@ public class ContentExtractor {
         job.setNumReduceTasks(0);
         job.setOutputKeyClass(Document.class);
         job.setOutputValueClass(NullWritable.class);
-        FileInputFormat.addInputPath(job, new Path(args[1]));
-        FileOutputFormat.setOutputPath(job, new Path(args[2]));
+        for (int i = 0; i < args.length - 2; i++) {
+            MultipleInputs.addInputPath(job, new Path(args[i]), TextInputFormat.class);
+        }
+        FileOutputFormat.setOutputPath(job, new Path(args[args.length - 2]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
 
     }

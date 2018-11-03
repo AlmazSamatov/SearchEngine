@@ -1,15 +1,13 @@
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +17,7 @@ public class Indexer {
     private static Vocabulary vocabulary = new Vocabulary();
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-        Vocabulary.readVocabulary(args[2]);
+        Vocabulary.readVocabulary(args[args.length - 1]);
 
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "indexing");
@@ -28,8 +26,10 @@ public class Indexer {
         job.setNumReduceTasks(0);
         job.setOutputKeyClass(IntWritable.class);
         job.setOutputValueClass(DoubleWritable.class);
-        FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        for (int i = 0; i < args.length - 2; i++) {
+            MultipleInputs.addInputPath(job, new Path(args[i]), TextInputFormat.class);
+        }
+        FileOutputFormat.setOutputPath(job, new Path(args[args.length - 2]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 
