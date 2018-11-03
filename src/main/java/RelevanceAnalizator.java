@@ -11,6 +11,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public class RelevanceAnalizator {

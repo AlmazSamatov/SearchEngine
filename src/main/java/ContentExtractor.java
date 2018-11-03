@@ -2,13 +2,15 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparator;
-import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -36,79 +38,16 @@ public class ContentExtractor {
         }
     }
 
-    public static class ContentExtractorMapper extends Mapper<Document, NullWritable, Document, NullWritable> {
+    public static class ContentExtractorMapper extends Mapper<LongWritable, Text, Document, NullWritable> {
 
         @Override
-        protected void map(Document key, NullWritable value, Context context) throws IOException, InterruptedException {
-            Double relevance = results.get(key.getId());
+        protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+            Document document = new Document(new JSONObject(value));
+            Double relevance = results.get(document.getId());
+
             if (relevance != null) {
-                context.write(key, NullWritable.get());
+                context.write(document, NullWritable.get());
             }
-        }
-    }
-
-    public class CustomInputFormat extends FileInputFormat<Document, NullWritable> {
-
-        @Override
-        protected boolean isSplitable(JobContext context, Path filename) {
-            return false;
-        }
-
-        @Override
-        public RecordReader<Document, NullWritable> createRecordReader(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException {
-            CustomRecordReader customRecordReader = new CustomRecordReader();
-            customRecordReader.initialize(inputSplit, taskAttemptContext);
-            return customRecordReader;
-        }
-    }
-
-    public class CustomRecordReader extends RecordReader<Document, NullWritable> {
-
-        private Document currentKey = new Document();
-        private JSONArray jsonArray;
-        private int currentIndex = 0;
-
-        @Override
-        public void initialize(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException {
-            FileSplit split = (FileSplit) inputSplit;
-            Configuration job = taskAttemptContext.getConfiguration();
-
-            final Path file = split.getPath();
-            FileSystem fs = file.getFileSystem(job);
-            FSDataInputStream inputStream = fs.open(split.getPath());
-            byte[] bs = new byte[inputStream.available()];
-            inputStream.read(bs);
-            String s = new String(bs);
-            jsonArray = new JSONArray(s);
-        }
-
-        @Override
-        public boolean nextKeyValue() throws IOException {
-            if (currentIndex + 1 < jsonArray.length()) {
-                currentKey = new Document(jsonArray.getJSONObject(currentIndex));
-                currentIndex++;
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public Document getCurrentKey() {
-            return currentKey;
-        }
-
-        @Override
-        public NullWritable getCurrentValue() {
-            return NullWritable.get();
-        }
-
-        @Override
-        public float getProgress() throws IOException {
-            return currentIndex / jsonArray.length();
-        }
-
-        @Override
-        public void close() throws IOException {
         }
     }
 
@@ -132,7 +71,6 @@ public class ContentExtractor {
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "content extractor");
         job.setJarByClass(ContentExtractor.class);
-        job.setInputFormatClass(CustomInputFormat.class);
         job.setMapperClass(ContentExtractorMapper.class);
         job.setSortComparatorClass(ContentExtractorResultsComparator.class);
         job.setNumReduceTasks(0);
