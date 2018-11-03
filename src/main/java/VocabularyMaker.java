@@ -18,7 +18,7 @@ public class VocabularyMaker {
         Map<String, Integer> wordIds = new HashMap<>();
         Map<Integer, Integer> idf = new HashMap<>();
 
-        FileStatus[] fileStatus = fileSystem.listStatus(new Path("hdfs://namenode:9000/home/team6/" + wordIdsDir));
+        FileStatus[] fileStatus = fileSystem.listStatus(new Path("hdfs://namenode:9000/user/team6/" + wordIdsDir));
         for (FileStatus status : fileStatus) {
             try (Scanner scanner = new Scanner(fileSystem.open(status.getPath()))) {
                 while (scanner.hasNext()) {
@@ -27,7 +27,7 @@ public class VocabularyMaker {
             }
         }
 
-        fileStatus = fileSystem.listStatus(new Path("hdfs://namenode:9000/home/team6/" + idfDir));
+        fileStatus = fileSystem.listStatus(new Path("hdfs://namenode:9000/user/team6/idf" + idfDir));
         for (FileStatus status : fileStatus) {
             try (Scanner scanner = new Scanner(fileSystem.open(status.getPath()))) {
                 while (scanner.hasNext()) {
@@ -38,7 +38,7 @@ public class VocabularyMaker {
 
         Vocabulary vocabulary = new Vocabulary(wordIds, idf);
 
-        try (FSDataOutputStream outputStream = fileSystem.create(new Path("hdfs://namenode:9000/home/team6/" + pathToWrite))) {
+        try (FSDataOutputStream outputStream = fileSystem.create(new Path("hdfs://namenode:9000/user/team6/vocabulary"))) {
             vocabulary.write(outputStream);
         }
     }
