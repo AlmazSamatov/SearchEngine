@@ -1,3 +1,9 @@
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -8,14 +14,28 @@ import java.util.StringTokenizer;
  */
 public class QueryVectorizer {
 
+    private Vocabulary readVocabulary(String pathToVoc) throws IOException {
+        Configuration configuration = new Configuration();
+        FileSystem fileSystem = FileSystem.get(configuration);
+
+        Vocabulary vocabulary = new Vocabulary();
+
+        try (FSDataInputStream inputStream = fileSystem.open(new Path(pathToVoc))) {
+            vocabulary.readFields(inputStream);
+        }
+
+        return vocabulary;
+    }
+
     /**
      * This method converts string query to map.
+     *
      * @param query query
-     * @param wordsIDs map containing words strings as keys and their IDs as values.
-     * @param IDFVocabulary map containing word IDs as keys and their IDF values as values.
      * @return map containing word IDs present in query as keys and their TF/IDF values as values.
      */
-    public static Map<Integer, Double> convertQueryToVector(String query, Map<String, Integer> wordsIDs, Map<Integer, Integer> IDFVocabulary) {
+    public Map<Integer, Double> convertQueryToVector(String query, String pathToVoc) throws IOException {
+        Vocabulary vocabulary = readVocabulary(pathToVoc);
+
         Map<Integer, Double> wordsInQuery = new HashMap<>();
 
         StringTokenizer tokenizer = new StringTokenizer(query);
@@ -27,10 +47,10 @@ public class QueryVectorizer {
             token = token.toLowerCase();
             token = token.replaceAll("[^\\w&&[^-]]", "");
 
-            if (wordsIDs.containsKey(token)) {
+            if (vocabulary.getWordIds().containsKey(token)) {
                 // Operate only if the word is present in wordsIDs vocabulary reached from dataset:
 
-                int tokenID = wordsIDs.get(token);
+                int tokenID = vocabulary.getWordIds().get(token);
 
                 if (!wordsInQuery.containsKey(tokenID)) {
                     wordsInQuery.put(tokenID, 1.0);
@@ -42,26 +62,9 @@ public class QueryVectorizer {
 
         // Normalize words quantities by IDF values:
         for (Map.Entry<Integer, Double> entry : wordsInQuery.entrySet()) {
-            wordsInQuery.put(entry.getKey(), entry.getValue() / IDFVocabulary.get(entry.getKey()));
+            wordsInQuery.put(entry.getKey(), entry.getValue() / vocabulary.getIdf().get(entry.getKey()));
         }
 
         return wordsInQuery;
-    }
-
-    public static void main(String[] args) {
-        String query = "the population";
-        Map<String, Integer> wordsIDs = new HashMap<>();
-        Map<Integer, Integer> IDFVocabulary = new HashMap<>();
-
-        wordsIDs.put("population", 22);
-        wordsIDs.put("the", 24);
-
-        IDFVocabulary.put(22, 2);
-        IDFVocabulary.put(24, 3);
-
-        Map<Integer, Double> vector = convertQueryToVector(query, wordsIDs, IDFVocabulary);
-        for (Map.Entry<Integer, Double> entry : vector.entrySet()) {
-            System.out.println("(" + entry.getKey() + ": " + entry.getValue() + ")");
-        }
     }
 }

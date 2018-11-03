@@ -15,6 +15,8 @@ import java.util.List;
  */
 public class ContentExtractor {
 
+
+
     /**
      * This method extracts information about docs from data set using provided IDs of pages provided as arguments.
      *
@@ -77,12 +79,8 @@ public class ContentExtractor {
     }
 
     public static void main(String[] args) throws Exception{
-        List<Integer> list = new ArrayList<>();
 
-        list.add(303);
-        list.add(573);
-        list.add(12);
 
-        System.out.println(extract(list));
+
     }
 }
