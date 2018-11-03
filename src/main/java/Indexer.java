@@ -9,6 +9,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class Indexer {
     private static Vocabulary vocabulary = new Vocabulary();
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-        readVocabulary(args[2]);
+        Vocabulary.readVocabulary(args[2]);
 
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "indexing");
@@ -30,15 +31,6 @@ public class Indexer {
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
-    }
-
-    private static void readVocabulary(String pathToVocabulary) throws IOException {
-        Configuration configuration = new Configuration();
-        FileSystem fileSystem = FileSystem.get(configuration);
-
-        try (FSDataInputStream inputStream = fileSystem.open(new Path(pathToVocabulary))) {
-            vocabulary.readFields(inputStream);
-        }
     }
 
     public static class IndexMap extends Mapper<LongWritable, Text, DocVector, NullWritable> {

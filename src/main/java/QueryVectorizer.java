@@ -1,8 +1,3 @@
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,27 +9,14 @@ import java.util.StringTokenizer;
  */
 public class QueryVectorizer {
 
-    private Vocabulary readVocabulary(String pathToVoc) throws IOException {
-        Configuration configuration = new Configuration();
-        FileSystem fileSystem = FileSystem.get(configuration);
-
-        Vocabulary vocabulary = new Vocabulary();
-
-        try (FSDataInputStream inputStream = fileSystem.open(new Path(pathToVoc))) {
-            vocabulary.readFields(inputStream);
-        }
-
-        return vocabulary;
-    }
-
     /**
      * This method converts string query to map.
      *
      * @param query query
      * @return map containing word IDs present in query as keys and their TF/IDF values as values.
      */
-    public Map<Integer, Double> convertQueryToVector(String query, String pathToVoc) throws IOException {
-        Vocabulary vocabulary = readVocabulary(pathToVoc);
+    public Map<Integer, Double> convertQueryToVector(String query, String vocDir) throws IOException {
+        Vocabulary vocabulary = Vocabulary.readVocabulary(vocDir);
 
         Map<Integer, Double> wordsInQuery = new HashMap<>();
 

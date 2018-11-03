@@ -12,6 +12,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,19 +24,29 @@ public class ContentExtractor {
 
     private static Map<Integer, Double> results = new HashMap<>();
 
-    public static void readRelevanceResults(String pathToResults) throws IOException {
+    public static void readRelevanceResults(String vocDir) throws IOException {
         Configuration configuration = new Configuration();
         FileSystem fileSystem = FileSystem.get(configuration);
 
         Vocabulary vocabulary = new Vocabulary();
 
-        try (FSDataInputStream inputStream = fileSystem.open(new Path(pathToResults))) {
-            while (inputStream.available() > 0) {
-                RelevanceResults relevanceResults = new RelevanceResults();
-                relevanceResults.readFields(inputStream);
-                results.put(relevanceResults.getPrimaryField().get(), relevanceResults.getSecondaryField().get());
+        File dir = new File(vocDir);
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+            for (File child : directoryListing) {
+                if (child.getName().charAt(0) != '_') {
+                    try (FSDataInputStream inputStream = fileSystem.open(new Path(child.getPath().toString()))) {
+                        while (inputStream.available() > 0) {
+                            RelevanceResults relevanceResults = new RelevanceResults();
+                            relevanceResults.readFields(inputStream);
+                            results.put(relevanceResults.getPrimaryField().get(), relevanceResults.getSecondaryField().get());
+                        }
+                    }
+                }
             }
         }
+
+
     }
 
     public static class ContentExtractorMapper extends Mapper<LongWritable, Text, Document, NullWritable> {
