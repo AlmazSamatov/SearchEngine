@@ -7,10 +7,8 @@ import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -47,15 +45,15 @@ public class Indexer {
 
     public static class IndexMap extends Mapper<Text, NullWritable, DocVector, NullWritable> {
         public void map(Text key, NullWritable value, Context context) throws IOException, InterruptedException {
-            JSONObject jsonObject = null;
-            try {
-                jsonObject = (JSONObject) new JSONParser().parse(key.toString());
-            } catch (ParseException e) {
-                e.printStackTrace();
+            JSONObject jsonObject = new JSONObject(key.toString());
+            int docId = 0;
+            if (jsonObject.has("id")) {
+                docId = jsonObject.getInt("id");
             }
-            assert jsonObject != null;
-            int docId = Integer.valueOf(jsonObject.get("id").toString());
-            String text = jsonObject.get("text").toString();
+            String text = "";
+            if (jsonObject.has("text")) {
+                text = jsonObject.getString("text");
+            }
             Map<Integer, Integer> wordMap = new HashMap<>();
             Map<String, Integer> wordIds = vocabulary.getWordIds();
             StringTokenizer tokens = new StringTokenizer(text);
@@ -92,7 +90,7 @@ public class Indexer {
 
         @Override
         public RecordReader<Text, NullWritable> createRecordReader(InputSplit split, TaskAttemptContext context)
-                throws IOException, InterruptedException {
+                throws IOException {
             CompleteFileRecordReader reader = new CompleteFileRecordReader();
             reader.initialize(split, context);
             return reader;
@@ -108,7 +106,7 @@ public class Indexer {
         private int index = 0;
 
         @Override
-        public void initialize(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
+        public void initialize(InputSplit split, TaskAttemptContext context) throws IOException {
             this.fileSplit = (FileSplit) split;
             this.conf = context.getConfiguration();
 
@@ -121,43 +119,40 @@ public class Indexer {
                 IOUtils.readFully(in, contents, 0, contents.length);
                 Text text = new Text();
                 text.set(contents, 0, contents.length);
-                JSONParser jsonParser = new JSONParser();
-                jsonArray = (JSONArray) jsonParser.parse(text.toString());
-            } catch (ParseException e) {
-                e.printStackTrace();
+                jsonArray = new JSONArray(text.toString());
             } finally {
                 IOUtils.closeStream(in);
             }
         }
 
         @Override
-        public boolean nextKeyValue() throws IOException, InterruptedException {
+        public boolean nextKeyValue() {
             if (!processed) {
                 key.set(jsonArray.get(index).toString());
                 index++;
-                processed = index == jsonArray.size();
+                processed = index == jsonArray.length();
                 return true;
             }
             return false;
         }
 
         @Override
-        public Text getCurrentKey() throws IOException, InterruptedException {
+        public Text getCurrentKey() {
             return key;
         }
 
         @Override
-        public NullWritable getCurrentValue() throws IOException, InterruptedException {
+        public NullWritable getCurrentValue() {
             return NullWritable.get();
         }
 
         @Override
-        public float getProgress() throws IOException {
+        public float getProgress() {
             return processed ? 1.0f : 0.0f;
         }
 
         @Override
-        public void close() throws IOException {
+        public void close() {
         }
     }
 }
