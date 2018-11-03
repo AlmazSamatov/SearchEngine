@@ -33,9 +33,11 @@ public class DocumentCounter {
                 while (itr.hasMoreTokens()) {
                     String token = itr.nextToken().toLowerCase();
                     token = token.replaceAll("[^\\w&&[^-]]", "");
-                    word.set(token);
-                    IntWritable docId = new IntWritable(doc);
-                    context.write(word, docId);
+                    if (token.length() != 0) {
+                        word.set(token);
+                        IntWritable docId = new IntWritable(doc);
+                        context.write(word, docId);
+                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
