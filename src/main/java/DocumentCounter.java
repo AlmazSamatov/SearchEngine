@@ -1,11 +1,3 @@
-import java.io.IOException;
-import java.util.StringTokenizer;
-import java.io.BufferedReader;
-import java.io.StringReader;
-
-import org.json.JSONObject;
-import org.json.JSONException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -13,13 +5,15 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
-import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.HashSet;
+import java.util.StringTokenizer;
 
 public class DocumentCounter {
 
@@ -43,8 +37,7 @@ public class DocumentCounter {
                     IntWritable docId = new IntWritable(doc);
                     context.write(word, docId);
                 }
-            }
-            catch (JSONException e){
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
@@ -59,7 +52,7 @@ public class DocumentCounter {
         ) throws IOException, InterruptedException {
             HashSet<Integer> docsUsed = new HashSet<Integer>();
             int cnt = 0;
-            for (IntWritable val: values) {
+            for (IntWritable val : values) {
                 int v = val.get();
                 if (!docsUsed.contains(v)) {
                     cnt++;

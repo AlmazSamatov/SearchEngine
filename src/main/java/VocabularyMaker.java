@@ -3,7 +3,6 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,31 +17,15 @@ public class VocabularyMaker {
         Map<String, Integer> wordIds = new HashMap<>();
         Map<Integer, Integer> idf = new HashMap<>();
 
-        File dir = new File(wordIdsDir);
-        File[] directoryListing = dir.listFiles();
-        if (directoryListing != null) {
-            for (File child : directoryListing) {
-                if (child.getName().charAt(0) != '_') {
-                    try (Scanner scanner = new Scanner(fileSystem.open(new Path(child.getPath().toString())))) {
-                        while (scanner.hasNext()) {
-                            wordIds.put(scanner.next(), scanner.nextInt());
-                        }
-                    }
-                }
+        try (Scanner scanner = new Scanner(fileSystem.open(new Path(wordIdsDir)))) {
+            while (scanner.hasNext()) {
+                wordIds.put(scanner.next(), scanner.nextInt());
             }
         }
 
-        dir = new File(idfDir);
-        directoryListing = dir.listFiles();
-        if (directoryListing != null) {
-            for (File child : directoryListing) {
-                if (child.getName().charAt(0) != '_') {
-                    try (Scanner scanner = new Scanner(fileSystem.open(new Path(child.getPath().toString())))) {
-                        while (scanner.hasNext()) {
-                            idf.put(scanner.nextInt(), scanner.nextInt());
-                        }
-                    }
-                }
+        try (Scanner scanner = new Scanner(fileSystem.open(new Path(idfDir)))) {
+            while (scanner.hasNext()) {
+                idf.put(scanner.nextInt(), scanner.nextInt());
             }
         }
 
