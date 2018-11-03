@@ -11,6 +11,8 @@ public class Vocabulary implements Writable {
     private Map<String, Integer> wordIds;
     private Map<Integer, Integer> idf;
 
+    Vocabulary() {}
+
     Vocabulary(Map<String, Integer> wordIds, Map<Integer, Integer> idf) {
         this.wordIds = wordIds;
         this.idf = idf;
