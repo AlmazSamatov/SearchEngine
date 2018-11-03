@@ -7,8 +7,26 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public class RelevanceResults implements WritableComparable<RelevanceResults> {
-    IntWritable primaryField = new IntWritable();
-    DoubleWritable secondaryField = new DoubleWritable();
+    private IntWritable primaryField = new IntWritable();
+    private DoubleWritable secondaryField = new DoubleWritable();
+
+    public IntWritable getPrimaryField() {
+        return primaryField;
+    }
+
+    public void setPrimaryField(IntWritable primaryField) {
+        this.primaryField = primaryField;
+    }
+
+    public DoubleWritable getSecondaryField() {
+        return secondaryField;
+    }
+
+    public void setSecondaryField(DoubleWritable secondaryField) {
+        this.secondaryField = secondaryField;
+    }
+
+    RelevanceResults() {}
 
     RelevanceResults(int key, double value) {
         primaryField.set(key);

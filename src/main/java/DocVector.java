@@ -11,7 +11,9 @@ public class DocVector implements Writable {
     private int docId;
     private Map<Integer, Double> vector;
 
-    public DocVector(int id, Map<Integer, Double> wordMap) {
+    DocVector() {}
+
+    DocVector(int id, Map<Integer, Double> wordMap) {
         docId = id;
         vector = wordMap;
     }
