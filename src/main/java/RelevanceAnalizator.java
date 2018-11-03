@@ -8,8 +8,6 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Map;
 
@@ -36,6 +34,11 @@ public class RelevanceAnalizator {
     }
 
     public class CustomInputFormat extends FileInputFormat<DocVector, NullWritable> {
+
+        @Override
+        protected boolean isSplitable(JobContext context, Path filename) {
+            return false;
+        }
 
         @Override
         public RecordReader<DocVector, NullWritable> createRecordReader(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException {
