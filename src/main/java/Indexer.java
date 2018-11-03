@@ -44,11 +44,13 @@ public class Indexer {
             while (tokens.hasMoreTokens()) {
                 String token = tokens.nextToken().toLowerCase();
                 token = token.replaceAll("[^\\w&&[^-]]", "");
-                Integer wordId = wordIds.get(token);
-                if (!wordMap.containsKey(wordId)) {
-                    wordMap.put(wordId, 1);
-                } else {
-                    wordMap.put(wordId, wordMap.get(wordId) + 1);
+                if (token.length() != 0) {
+                    Integer wordId = wordIds.get(token);
+                    if (!wordMap.containsKey(wordId)) {
+                        wordMap.put(wordId, 1);
+                    } else {
+                        wordMap.put(wordId, wordMap.get(wordId) + 1);
+                    }
                 }
             }
 
