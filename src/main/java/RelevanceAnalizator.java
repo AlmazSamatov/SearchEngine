@@ -53,7 +53,12 @@ public class RelevanceAnalizator {
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-        Map<Integer, Double> queryVector = QueryVectorizer.convertQueryToVector(args[args.length - 1], args[1]);
+        StringBuilder query = new StringBuilder();
+        for (int i = 3; i < args.length; i++){
+            query.append(args[i]);
+        }
+        Map<Integer, Double> queryVector = QueryVectorizer.convertQueryToVector(query.toString(), args[1]);
+        System.out.println(queryVector);
 
         Configuration conf = new Configuration();
         conf.set("queryVector", QueryVectorizer.serialize(queryVector));
