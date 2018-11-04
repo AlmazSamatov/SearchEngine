@@ -11,6 +11,8 @@ public class OutputDocument implements WritableComparable<OutputDocument> {
     private String url = "";
     private double relevance = 0;
 
+    OutputDocument() {}
+
     OutputDocument(Document d){
         title = d.getTitle();
         url = d.getUrl() + String.valueOf(d.getId());
