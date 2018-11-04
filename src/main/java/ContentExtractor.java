@@ -69,6 +69,7 @@ public class ContentExtractor {
         @Override
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
             Document document = new Document(value.toString());
+            document.setRelevance(results.get(document.getId()));
             Double relevance = results.get(document.getId());
 
             if (relevance != null) {
@@ -121,7 +122,7 @@ public class ContentExtractor {
             MultipleInputs.addInputPath(job, new Path(args[i]), TextInputFormat.class);
         }
         FileOutputFormat.setOutputPath(job, new Path(args[args.length - 1]));
-        System.exit(job.waitForCompletion(true) ? 0 : 1);
+        System.exit(job.waitForCompletion(true) ? 0: 1);
 
     }
 }
