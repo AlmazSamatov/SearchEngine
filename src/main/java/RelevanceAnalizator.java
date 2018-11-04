@@ -3,6 +3,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
@@ -35,7 +36,13 @@ public class RelevanceAnalizator {
             }
 
             context.write(new RelevanceResults(docVector.getDocId(), relevance), NullWritable.get());
+        }
+    }
 
+    public static class RelevanceReducer extends Reducer<RelevanceResults, NullWritable, RelevanceResults, NullWritable> {
+        @Override
+        protected void reduce(RelevanceResults key, Iterable<NullWritable> values, Context context) throws IOException, InterruptedException {
+            context.write(key, NullWritable.get());
         }
     }
 
@@ -55,7 +62,7 @@ public class RelevanceAnalizator {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
         StringBuilder query = new StringBuilder();
-        for (int i = 3; i < args.length; i++){
+        for (int i = 3; i < args.length; i++) {
             query.append(args[i]);
         }
         Map<Integer, Double> queryVector = QueryVectorizer.convertQueryToVector(query.toString(), args[1]);
@@ -66,7 +73,7 @@ public class RelevanceAnalizator {
         job.setJarByClass(RelevanceAnalizator.class);
         job.setMapperClass(RelevanceMapper.class);
         job.setSortComparatorClass(RelevanceResultsComparator.class);
-        job.setNumReduceTasks(0);
+        job.setReducerClass(RelevanceReducer.class);
         job.setOutputKeyClass(RelevanceResults.class);
         job.setOutputValueClass(NullWritable.class);
         FileInputFormat.addInputPath(job, new Path(args[0]));
