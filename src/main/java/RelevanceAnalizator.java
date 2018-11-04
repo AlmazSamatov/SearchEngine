@@ -24,16 +24,17 @@ public class RelevanceAnalizator {
         public void map(LongWritable offset, Text doc, Context context) throws IOException, InterruptedException {
             DocVector docVector = new DocVector(doc.toString());
 
-            for (Map.Entry<Integer, Double> entry : queryVector.entrySet()) {
+            double relevance = 0;
 
-                double relevance = 0;
+            for (Map.Entry<Integer, Double> entry : queryVector.entrySet()) {
 
                 if (docVector.getVector().containsKey(entry.getKey())) {
                     relevance += docVector.getVector().get(entry.getKey()) * entry.getValue();
-                    context.write(new RelevanceResults(entry.getKey(), relevance), NullWritable.get());
                 }
 
             }
+
+            context.write(new RelevanceResults(docVector.getDocId(), relevance), NullWritable.get());
 
         }
     }
