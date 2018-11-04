@@ -1,5 +1,4 @@
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -38,9 +37,7 @@ public class VocabularyMaker {
 
         Vocabulary vocabulary = new Vocabulary(wordIds, idf);
 
-        try (FSDataOutputStream outputStream = fileSystem.create(new Path("hdfs://namenode:9000/user/team6/" + pathToWrite))) {
-            vocabulary.write(outputStream);
-        }
+        Vocabulary.writeVocabularyToFile(vocabulary, pathToWrite);
     }
 
     public static void main(String[] args) throws IOException {

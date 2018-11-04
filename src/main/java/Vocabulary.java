@@ -1,14 +1,8 @@
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Writable;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 import java.util.Map;
 
 public class Vocabulary implements Writable {
@@ -57,16 +51,25 @@ public class Vocabulary implements Writable {
         this.idf = idf;
     }
 
-    public static Vocabulary readVocabulary(String vocDir) throws IOException {
-        Configuration configuration = new Configuration();
-        FileSystem fileSystem = FileSystem.get(configuration);
-
+    public static Vocabulary readVocabulary(String fileName) throws IOException {
         Vocabulary vocabulary = new Vocabulary();
 
-        try (FSDataInputStream inputStream = fileSystem.open(new Path(vocDir))) {
-            vocabulary.readFields(inputStream);
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)))) {
+            Gson gson = new Gson();
+            String serializedWordIds = bufferedReader.readLine();
+            vocabulary.setWordIds(gson.fromJson(serializedWordIds, new TypeToken<Map<String, Integer>>() {}.getType()));
+            String serializedIdf = bufferedReader.readLine();
+            vocabulary.setIdf(gson.fromJson(serializedIdf, new TypeToken<Map<String, Integer>>() {}.getType()));
         }
 
         return vocabulary;
+    }
+
+    public static void writeVocabularyToFile(Vocabulary vocabulary, String fileName) throws IOException {
+        try (PrintWriter printWriter = new PrintWriter(new File(fileName))) {
+            Gson gson = new Gson();
+            printWriter.println(gson.toJson(vocabulary.getWordIds()));
+            printWriter.println(gson.toJson(vocabulary.getIdf()));
+        }
     }
 }
