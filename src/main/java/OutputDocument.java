@@ -45,15 +45,15 @@ public class OutputDocument implements WritableComparable<OutputDocument> {
 
     @Override
     public void write(DataOutput dataOutput) throws IOException {
-        dataOutput.writeUTF(title);
-        dataOutput.writeUTF(url);
+        dataOutput.writeChars(title);
+        dataOutput.writeChars(url);
         dataOutput.writeDouble(relevance);
     }
 
     @Override
     public void readFields(DataInput dataInput) throws IOException {
-        title = dataInput.readUTF();
-        url = dataInput.readUTF();
+        title = dataInput.readLine();
+        url = dataInput.readLine();
         relevance = dataInput.readDouble();
     }
 
