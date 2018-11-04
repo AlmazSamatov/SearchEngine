@@ -55,7 +55,7 @@ public class ContentExtractor {
 
         @Override
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-            Document document = new Document(new JSONObject(value));
+            Document document = new Document(value.toString());
             Double relevance = results.get(document.getId());
 
             if (relevance != null) {

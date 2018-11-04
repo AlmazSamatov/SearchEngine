@@ -1,4 +1,5 @@
 import org.apache.hadoop.io.WritableComparable;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.DataInput;
@@ -15,15 +16,20 @@ public class Document implements WritableComparable<Document> {
     Document() {
     }
 
-    Document(JSONObject jsonObject) {
-        if (jsonObject.has("id"))
-            id = jsonObject.getInt("id");
-        if (jsonObject.has("title"))
-            title = jsonObject.getString("title");
-        if (jsonObject.has("url"))
-            title = jsonObject.getString("url");
-        if (jsonObject.has("text"))
-            title = jsonObject.getString("text");
+    Document(String serialized) {
+        try {
+            JSONObject jsonObject = new JSONObject(serialized);
+            if (jsonObject.has("id"))
+                id = jsonObject.getInt("id");
+            if (jsonObject.has("title"))
+                title = jsonObject.getString("title");
+            if (jsonObject.has("url"))
+                title = jsonObject.getString("url");
+            if (jsonObject.has("text"))
+                title = jsonObject.getString("text");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
