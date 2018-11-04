@@ -12,6 +12,7 @@ public class Document implements WritableComparable<Document> {
     private String title = "";
     private String url = "";
     private String text = "";
+    private double relevance = 0;
 
     Document() {
     }
@@ -27,6 +28,8 @@ public class Document implements WritableComparable<Document> {
                 title = jsonObject.getString("url");
             if (jsonObject.has("text"))
                 title = jsonObject.getString("text");
+            if (jsonObject.has("relevance"))
+                relevance = jsonObject.getDouble("relevance");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -38,6 +41,7 @@ public class Document implements WritableComparable<Document> {
         dataOutput.writeUTF(title);
         dataOutput.writeUTF(url);
         dataOutput.writeUTF(text);
+        dataOutput.writeDouble(relevance);
     }
 
     @Override
@@ -46,6 +50,12 @@ public class Document implements WritableComparable<Document> {
         title = dataInput.readUTF();
         url = dataInput.readUTF();
         text = dataInput.readUTF();
+        relevance = dataInput.readDouble();
+    }
+
+    @Override
+    public int compareTo(Document o) {
+        return Double.compare(relevance, o.getRelevance());
     }
 
     public int getId() {
@@ -80,8 +90,11 @@ public class Document implements WritableComparable<Document> {
         this.text = text;
     }
 
-    @Override
-    public int compareTo(Document o) {
-        return 0;
+    public double getRelevance() {
+        return relevance;
+    }
+
+    public void setRelevance(double relevance) {
+        this.relevance = relevance;
     }
 }
