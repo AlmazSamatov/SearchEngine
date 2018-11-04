@@ -63,7 +63,6 @@ public class Vocabulary implements Writable {
 
         Vocabulary vocabulary = new Vocabulary();
 
-
         try (FSDataInputStream inputStream = fileSystem.open(new Path(vocDir))) {
             vocabulary.readFields(inputStream);
         }

@@ -13,10 +13,10 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 public class Indexer {
-    private static Vocabulary vocabulary = new Vocabulary();
+    private static Vocabulary vocabulary;
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-        Vocabulary.readVocabulary(args[args.length - 2]);
+        vocabulary = Vocabulary.readVocabulary(args[args.length - 2]);
 
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "indexing");
