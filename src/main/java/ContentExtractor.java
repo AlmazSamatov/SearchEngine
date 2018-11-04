@@ -8,11 +8,14 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.WritableComparator;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.jasper.tagplugins.jstl.core.Out;
 
 import java.io.File;
 import java.io.IOException;
@@ -113,6 +116,28 @@ public class ContentExtractor {
 
     }
 
+    public static class ContentExtractorReducer extends Reducer<OutputDocument, NullWritable, OutputDocument, NullWritable> {
+
+        @Override
+        protected void reduce(OutputDocument key, Iterable<NullWritable> values, Context context) throws IOException, InterruptedException {
+            context.write(key, NullWritable.get());
+        }
+    }
+
+    public static class ContentExtractorResultsComparator extends WritableComparator {
+
+        protected ContentExtractorResultsComparator() {
+            super(OutputDocument.class);
+        }
+
+        @Override
+        public int compare(Object a, Object b) {
+            OutputDocument d1 = (OutputDocument) a;
+            OutputDocument d2 = (OutputDocument) b;
+            return d1.compareTo(d2);
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         Map<Integer, Double> relevanceResults = readRelevanceResults(args[args.length - 2]);
 
@@ -121,15 +146,16 @@ public class ContentExtractor {
         Job job = Job.getInstance(conf, "content extractor");
         job.setJarByClass(ContentExtractor.class);
         job.setMapperClass(ContentExtractorMapper.class);
+        job.setReducerClass(ContentExtractorReducer.class);
+        job.setSortComparatorClass(ContentExtractorResultsComparator.class);
         job.setOutputKeyClass(OutputDocument.class);
-        job.setNumReduceTasks(0);
         job.setOutputValueClass(NullWritable.class);
         for (int i = 0; i < args.length - 2; i++) {
             MultipleInputs.addInputPath(job, new Path(args[i]), TextInputFormat.class);
         }
         FileOutputFormat.setOutputPath(job, new Path(args[args.length - 1]));
-        job.waitForCompletion(true);
+        System.exit(job.waitForCompletion(true) ? 0 : 1);
 
-        sortOutput(args[args.length - 1]);
+        //sortOutput(args[args.length - 1]);
     }
 }
