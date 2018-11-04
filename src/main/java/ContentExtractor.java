@@ -15,7 +15,6 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.jasper.tagplugins.jstl.core.Out;
 
 import java.io.File;
 import java.io.IOException;
@@ -127,7 +126,7 @@ public class ContentExtractor {
     public static class ContentExtractorResultsComparator extends WritableComparator {
 
         protected ContentExtractorResultsComparator() {
-            super(OutputDocument.class);
+            super(OutputDocument.class, true);
         }
 
         @Override
