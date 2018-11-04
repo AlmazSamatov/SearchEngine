@@ -58,6 +58,12 @@ public class Document implements WritableComparable<Document> {
         return Double.compare(relevance, o.getRelevance());
     }
 
+    @Override
+    public String toString() {
+        Gson gson = new Gson();
+        return gson.toJson(this);
+    }
+
     public int getId() {
         return id;
     }
