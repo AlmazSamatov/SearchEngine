@@ -50,7 +50,7 @@ public class ContentExtractor {
         return results;
     }
 
-    public static class ContentExtractorMapper extends Mapper<LongWritable, Text, Document, NullWritable> {
+    public static class ContentExtractorMapper extends Mapper<LongWritable, Text, OutputDocument, NullWritable> {
 
         private static Map<Integer, Double> results = new HashMap<>();
 
@@ -72,16 +72,16 @@ public class ContentExtractor {
             Double relevance = results.get(document.getId());
 
             if (relevance != null) {
-                context.write(document, NullWritable.get());
+                context.write(new OutputDocument(document), NullWritable.get());
             }
         }
     }
 
-    public static class ContentExtractorReducer extends Reducer<Document, NullWritable, OutputDocument, NullWritable> {
+    public static class ContentExtractorReducer extends Reducer<OutputDocument, NullWritable, OutputDocument, NullWritable> {
 
         @Override
-        protected void reduce(Document key, Iterable<NullWritable> values, Context context) throws IOException, InterruptedException {
-            context.write(new OutputDocument(key), NullWritable.get());
+        protected void reduce(OutputDocument key, Iterable<NullWritable> values, Context context) throws IOException, InterruptedException {
+            context.write(key, NullWritable.get());
         }
     }
 
@@ -114,7 +114,6 @@ public class ContentExtractor {
         job.setMapperClass(ContentExtractorMapper.class);
         job.setSortComparatorClass(ContentExtractorResultsComparator.class);
         job.setReducerClass(ContentExtractorReducer.class);
-        job.setMapOutputKeyClass(Document.class);
         job.setOutputKeyClass(OutputDocument.class);
         job.setOutputValueClass(NullWritable.class);
         for (int i = 0; i < args.length - 2; i++) {
