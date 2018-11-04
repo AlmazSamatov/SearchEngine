@@ -17,7 +17,7 @@ public class Indexer {
     private static Vocabulary vocabulary = new Vocabulary();
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-        Vocabulary.readVocabulary(args[args.length - 1]);
+        Vocabulary.readVocabulary(args[args.length - 2]);
 
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "indexing");
@@ -29,7 +29,7 @@ public class Indexer {
         for (int i = 0; i < args.length - 2; i++) {
             MultipleInputs.addInputPath(job, new Path(args[i]), TextInputFormat.class);
         }
-        FileOutputFormat.setOutputPath(job, new Path(args[args.length - 2]));
+        FileOutputFormat.setOutputPath(job, new Path(args[args.length - 1]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 
