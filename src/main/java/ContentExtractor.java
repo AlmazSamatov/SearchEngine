@@ -2,6 +2,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
@@ -32,17 +33,15 @@ public class ContentExtractor {
 
         Map<Integer, Double> results = new HashMap<>();
 
-        File dir = new File(relevanceDir);
-        File[] directoryListing = dir.listFiles();
-        if (directoryListing != null) {
-            for (File child : directoryListing) {
-                if (child.getName().charAt(0) != '_') {
-                    try (FSDataInputStream inputStream = fileSystem.open(new Path(child.getPath().toString()))) {
-                        while (inputStream.available() > 0) {
-                            RelevanceResults relevanceResults = new RelevanceResults();
-                            relevanceResults.readFields(inputStream);
-                            results.put(relevanceResults.getPrimaryField().get(), relevanceResults.getSecondaryField().get());
-                        }
+        FileStatus[] status = fileSystem.listStatus(new Path("hdfs://namenode:9000/user/team6/" + relevanceDir));
+
+        for (FileStatus child: status) {
+            if (child.getPath().getName().charAt(0) != '_') {
+                try (FSDataInputStream inputStream = fileSystem.open(child.getPath())) {
+                    while (inputStream.available() > 0) {
+                        RelevanceResults relevanceResults = new RelevanceResults();
+                        relevanceResults.readFields(inputStream);
+                        results.put(relevanceResults.getPrimaryField().get(), relevanceResults.getSecondaryField().get());
                     }
                 }
             }
