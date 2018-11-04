@@ -26,9 +26,9 @@ public class Document implements WritableComparable<Document> {
             if (jsonObject.has("title"))
                 title = jsonObject.getString("title");
             if (jsonObject.has("url"))
-                title = jsonObject.getString("url");
+                url = jsonObject.getString("url");
             if (jsonObject.has("text"))
-                title = jsonObject.getString("text");
+                text = jsonObject.getString("text");
             if (jsonObject.has("relevance"))
                 relevance = jsonObject.getDouble("relevance");
         } catch (JSONException e) {
