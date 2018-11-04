@@ -16,7 +16,9 @@ public class Indexer {
     private static Vocabulary vocabulary;
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
+        System.out.println("Start reading vocabulary...");
         vocabulary = Vocabulary.readVocabulary(args[args.length - 2]);
+        System.out.println("Vocabulary read ended...");
 
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "indexing");
