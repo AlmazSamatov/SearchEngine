@@ -49,7 +49,7 @@ public class Indexer {
         public void map(LongWritable offset, Text doc, Context context) throws IOException, InterruptedException {
             Document document = new Document(doc.toString());
 
-            Map<Integer, Integer> wordMap = new HashMap<>();
+            Map<String, Integer> wordMap = new HashMap<>();
             Map<String, Integer> wordIds = vocabulary.getWordIds();
             StringTokenizer tokens = new StringTokenizer(document.getText());
 
@@ -57,23 +57,23 @@ public class Indexer {
                 String token = tokens.nextToken().toLowerCase();
                 token = token.replaceAll("[^\\w&&[^-]]", "");
                 if (token.length() != 0) {
-                    Integer wordId = wordIds.get(token);
-                    if (!wordMap.containsKey(wordId)) {
-                        wordMap.put(wordId, 1);
+                    if (!wordMap.containsKey(token)) {
+                        wordMap.put(token, 1);
                     } else {
-                        wordMap.put(wordId, wordMap.get(wordId) + 1);
+                        wordMap.put(token, wordMap.get(token) + 1);
                     }
                 }
             }
 
             Map<Integer, Double> result = new HashMap<>();
-            for (Map.Entry<String, Integer> entry : vocabulary.getIdf().entrySet()) {
-                Integer wordId = wordIds.get(entry.getKey());
-                if (wordMap.get(wordId) != null)
-                    result.put(wordId, (double) (wordMap.get(wordId) / entry.getValue()));
-            }
-            context.write(new DocVector(document.getId(), result), NullWritable.get());
+            Map<String, Integer> idf = vocabulary.getIdf();
 
+            for (Map.Entry<String, Integer> entry : wordMap.entrySet()) {
+                Integer wordId = wordIds.get(entry.getKey());
+                result.put(wordId, (double) (entry.getValue() / idf.get(entry.getKey())));
+            }
+
+            context.write(new DocVector(document.getId(), result), NullWritable.get());
         }
     }
 }
