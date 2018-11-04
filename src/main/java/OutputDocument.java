@@ -70,4 +70,15 @@ public class OutputDocument implements WritableComparable<OutputDocument> {
         return gson.toJson(this);
     }
 
+    public static OutputDocument deserialize(String s) throws IOException {
+        Gson gson = new Gson();
+        OutputDocument document = gson.fromJson(s, OutputDocument.class);
+        return document;
+    }
+
+    public static String serialize(OutputDocument d) throws IOException {
+        Gson gson = new Gson();
+        return gson.toJson(d);
+    }
+
 }

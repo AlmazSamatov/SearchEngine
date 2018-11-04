@@ -19,6 +19,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 /**
@@ -126,14 +127,19 @@ public class ContentExtractor {
     public static class ContentExtractorResultsComparator extends WritableComparator {
 
         protected ContentExtractorResultsComparator() {
-            super(OutputDocument.class, true);
+            super(OutputDocument.class);
         }
 
         @Override
-        public int compare(Object a, Object b) {
-            OutputDocument d1 = (OutputDocument) a;
-            OutputDocument d2 = (OutputDocument) b;
-            return d1.compareTo(d2);
+        public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
+            try {
+                OutputDocument o1 = OutputDocument.deserialize(new String(ByteBuffer.wrap(b1, s1, l1).array()));
+                OutputDocument o2 = OutputDocument.deserialize(new String(ByteBuffer.wrap(b2, s2, l2).array()));
+                return o1.compareTo(o2);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return 0;
         }
     }
 
