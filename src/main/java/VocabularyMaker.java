@@ -27,7 +27,7 @@ public class VocabularyMaker {
             }
         }
 
-        fileStatus = fileSystem.listStatus(new Path("hdfs://namenode:9000/user/team6/idf" + idfDir));
+        fileStatus = fileSystem.listStatus(new Path("hdfs://namenode:9000/user/team6/" + idfDir));
         for (FileStatus status : fileStatus) {
             try (Scanner scanner = new Scanner(fileSystem.open(status.getPath()))) {
                 while (scanner.hasNext()) {

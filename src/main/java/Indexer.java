@@ -55,8 +55,9 @@ public class Indexer {
             }
 
             Map<Integer, Double> result = new HashMap<>();
-            for (Map.Entry<Integer, Integer> entry : vocabulary.getIdf().entrySet()) {
-                result.put(entry.getKey(), (double) (wordMap.get(entry.getKey()) / entry.getValue()));
+            for (Map.Entry<String, Integer> entry : vocabulary.getIdf().entrySet()) {
+                Integer wordId = vocabulary.getWordIds().get(entry.getKey());
+                result.put(wordId, (double) (wordMap.get(wordId) / entry.getValue()));
             }
             context.write(new DocVector(document.getId(), result), NullWritable.get());
 

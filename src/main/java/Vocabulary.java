@@ -14,12 +14,12 @@ import java.util.Map;
 
 public class Vocabulary implements Writable {
     private Map<String, Integer> wordIds;
-    private Map<Integer, Integer> idf;
+    private Map<String, Integer> idf;
 
     Vocabulary() {
     }
 
-    Vocabulary(Map<String, Integer> wordIds, Map<Integer, Integer> idf) {
+    Vocabulary(Map<String, Integer> wordIds, Map<String, Integer> idf) {
         this.wordIds = wordIds;
         this.idf = idf;
     }
@@ -38,7 +38,7 @@ public class Vocabulary implements Writable {
         wordIds = gson.fromJson(serializedWordIds, new TypeToken<Map<String, Integer>>() {
         }.getType());
         String serializedIdf = dataInput.readLine();
-        idf = gson.fromJson(serializedIdf, new TypeToken<Map<Integer, Integer>>() {
+        idf = gson.fromJson(serializedIdf, new TypeToken<Map<String, Integer>>() {
         }.getType());
     }
 
@@ -50,11 +50,11 @@ public class Vocabulary implements Writable {
         this.wordIds = wordIds;
     }
 
-    public Map<Integer, Integer> getIdf() {
+    public Map<String, Integer> getIdf() {
         return idf;
     }
 
-    public void setIdf(Map<Integer, Integer> idf) {
+    public void setIdf(Map<String, Integer> idf) {
         this.idf = idf;
     }
 
