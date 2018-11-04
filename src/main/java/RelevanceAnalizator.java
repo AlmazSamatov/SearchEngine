@@ -1,9 +1,10 @@
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.*;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
@@ -39,26 +40,6 @@ public class RelevanceAnalizator {
         }
     }
 
-    public static class RelevanceReducer extends Reducer<RelevanceResults, NullWritable, RelevanceResults, NullWritable> {
-        @Override
-        protected void reduce(RelevanceResults key, Iterable<NullWritable> values, Context context) throws IOException, InterruptedException {
-            context.write(key, NullWritable.get());
-        }
-    }
-
-    public static class RelevanceResultsComparator extends WritableComparator {
-
-        protected RelevanceResultsComparator() {
-            super(RelevanceResults.class, true);
-        }
-
-        @Override
-        public int compare(WritableComparable a, WritableComparable b) {
-            RelevanceResults k1 = (RelevanceResults) a;
-            RelevanceResults k2 = (RelevanceResults) b;
-            return k1.compareTo(k2);
-        }
-    }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
         StringBuilder query = new StringBuilder();
@@ -72,8 +53,7 @@ public class RelevanceAnalizator {
         Job job = Job.getInstance(conf, "relevance analizator");
         job.setJarByClass(RelevanceAnalizator.class);
         job.setMapperClass(RelevanceMapper.class);
-        job.setSortComparatorClass(RelevanceResultsComparator.class);
-        job.setReducerClass(RelevanceReducer.class);
+        job.setNumReduceTasks(0);
         job.setOutputKeyClass(RelevanceResults.class);
         job.setOutputValueClass(NullWritable.class);
         FileInputFormat.addInputPath(job, new Path(args[0]));
