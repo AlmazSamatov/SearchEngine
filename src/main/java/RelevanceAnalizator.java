@@ -53,7 +53,7 @@ public class RelevanceAnalizator {
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-        Map<Integer, Double> queryVector = QueryVectorizer.convertQueryToVector(args[0], args[3]);
+        Map<Integer, Double> queryVector = QueryVectorizer.convertQueryToVector(args[args.length - 1], args[1]);
 
         Configuration conf = new Configuration();
         conf.set("queryVector", QueryVectorizer.serialize(queryVector));
@@ -64,7 +64,7 @@ public class RelevanceAnalizator {
         job.setNumReduceTasks(0);
         job.setOutputKeyClass(RelevanceResults.class);
         job.setOutputValueClass(NullWritable.class);
-        FileInputFormat.addInputPath(job, new Path(args[1]));
+        FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[2]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
