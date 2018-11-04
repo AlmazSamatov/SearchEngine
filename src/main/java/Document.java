@@ -55,7 +55,7 @@ public class Document implements WritableComparable<Document> {
 
     @Override
     public int compareTo(Document o) {
-        return Double.compare(relevance, o.getRelevance());
+        return Double.compare(o.getRelevance(), relevance);
     }
 
     @Override
