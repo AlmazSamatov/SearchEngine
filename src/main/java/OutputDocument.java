@@ -46,7 +46,7 @@ public class OutputDocument implements WritableComparable<OutputDocument> {
     @Override
     public void write(DataOutput dataOutput) throws IOException {
         Gson gson = new Gson();
-        dataOutput.writeChars(gson.toJson(this));
+        dataOutput.writeUTF(gson.toJson(this));
     }
 
     @Override
