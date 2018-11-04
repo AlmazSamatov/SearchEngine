@@ -113,7 +113,8 @@ public class ContentExtractor {
         job.setJarByClass(ContentExtractor.class);
         job.setMapperClass(ContentExtractorMapper.class);
         job.setSortComparatorClass(ContentExtractorResultsComparator.class);
-        job.setReducerClass(ContentExtractorReducer.class);
+        //job.setReducerClass(ContentExtractorReducer.class);
+        job.setNumReduceTasks(0);
         job.setOutputKeyClass(OutputDocument.class);
         job.setOutputValueClass(NullWritable.class);
         for (int i = 0; i < args.length - 2; i++) {
