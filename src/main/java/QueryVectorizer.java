@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 /**
  * This class is used in Search Engine application in order to convert string query to map containing word IDs as keys
@@ -55,11 +56,18 @@ public class QueryVectorizer {
             }
         }
 
+        Map<Integer, String> wordIdsInverse = vocabulary.getWordIds()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+
+        Map<Integer, Double> res = new HashMap<>();
+
         // Normalize words quantities by IDF values:
         for (Map.Entry<Integer, Double> entry : wordsInQuery.entrySet()) {
-            wordsInQuery.put(entry.getKey(), entry.getValue() / vocabulary.getIdf().get(entry.getKey()));
+            res.put(entry.getKey(), entry.getValue() / (double) vocabulary.getIdf().get(wordIdsInverse.get(entry.getKey())));
         }
 
-        return wordsInQuery;
+        return res;
     }
 }
