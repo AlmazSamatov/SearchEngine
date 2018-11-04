@@ -1,5 +1,4 @@
-import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.IntWritable;
+import com.google.gson.Gson;
 import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
@@ -7,46 +6,56 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public class RelevanceResults implements WritableComparable<RelevanceResults> {
-    private IntWritable primaryField = new IntWritable();
-    private DoubleWritable secondaryField = new DoubleWritable();
+    private int docId;
+    private double relevance;
 
-    public IntWritable getPrimaryField() {
-        return primaryField;
+    public int getDocId() {
+        return docId;
     }
 
-    public void setPrimaryField(IntWritable primaryField) {
-        this.primaryField = primaryField;
+    public double getRelevance() {
+        return relevance;
     }
 
-    public DoubleWritable getSecondaryField() {
-        return secondaryField;
+    public void setRelevance(double relevance) {
+        this.relevance = relevance;
     }
 
-    public void setSecondaryField(DoubleWritable secondaryField) {
-        this.secondaryField = secondaryField;
+    public void setDocId(int docId) {
+        this.docId = docId;
     }
 
-    RelevanceResults() {}
+    RelevanceResults() {
+
+    }
 
     RelevanceResults(int key, double value) {
-        primaryField.set(key);
-        secondaryField.set(value);
+        docId = key;
+        relevance = value;
     }
 
     @Override
     public int compareTo(RelevanceResults o) {
-        return Double.compare(secondaryField.get(), o.secondaryField.get());
+        return Double.compare(o.relevance, relevance);
     }
 
     @Override
     public void write(DataOutput dataOutput) throws IOException {
-        primaryField.write(dataOutput);
-        secondaryField.write(dataOutput);
+        Gson gson = new Gson();
+        dataOutput.writeChars(gson.toJson(this));
     }
 
     @Override
     public void readFields(DataInput dataInput) throws IOException {
-        primaryField.readFields(dataInput);
-        secondaryField.readFields(dataInput);
+        Gson gson = new Gson();
+        RelevanceResults relevanceResults = gson.fromJson(dataInput.readLine(), RelevanceResults.class);
+        docId = relevanceResults.docId;
+        relevance = relevanceResults.relevance;
+    }
+
+    @Override
+    public String toString() {
+        Gson gson = new Gson();
+        return gson.toJson(this);
     }
 }

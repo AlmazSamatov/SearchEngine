@@ -1,5 +1,5 @@
+import com.google.gson.Gson;
 import org.apache.hadoop.io.WritableComparable;
-import org.json.JSONObject;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -11,35 +11,47 @@ public class Document implements WritableComparable<Document> {
     private String title = "";
     private String url = "";
     private String text = "";
+    private double relevance = 0;
 
     Document() {
     }
 
-    Document(JSONObject jsonObject) {
-        if (jsonObject.has("id"))
-            id = jsonObject.getInt("id");
-        if (jsonObject.has("title"))
-            title = jsonObject.getString("title");
-        if (jsonObject.has("url"))
-            title = jsonObject.getString("url");
-        if (jsonObject.has("text"))
-            title = jsonObject.getString("text");
+    Document(String serialized) {
+        Gson gson = new Gson();
+        Document document = gson.fromJson(serialized, Document.class);
+        id = document.id;
+        title = document.title;
+        text = document.text;
+        url = document.url;
+        relevance = document.relevance;
     }
 
     @Override
     public void write(DataOutput dataOutput) throws IOException {
-        dataOutput.writeInt(id);
-        dataOutput.writeUTF(title);
-        dataOutput.writeUTF(url);
-        dataOutput.writeUTF(text);
+        Gson gson = new Gson();
+        dataOutput.writeChars(gson.toJson(this));
     }
 
     @Override
     public void readFields(DataInput dataInput) throws IOException {
-        id = dataInput.readInt();
-        title = dataInput.readUTF();
-        url = dataInput.readUTF();
-        text = dataInput.readUTF();
+        Gson gson = new Gson();
+        Document document = gson.fromJson(dataInput.readLine(), Document.class);
+        id = document.id;
+        title = document.title;
+        text = document.text;
+        url = document.url;
+        relevance = document.relevance;
+    }
+
+    @Override
+    public int compareTo(Document o) {
+        return Double.compare(o.getRelevance(), relevance);
+    }
+
+    @Override
+    public String toString() {
+        Gson gson = new Gson();
+        return gson.toJson(this);
     }
 
     public int getId() {
@@ -74,8 +86,11 @@ public class Document implements WritableComparable<Document> {
         this.text = text;
     }
 
-    @Override
-    public int compareTo(Document o) {
-        return 0;
+    public double getRelevance() {
+        return relevance;
+    }
+
+    public void setRelevance(double relevance) {
+        this.relevance = relevance;
     }
 }

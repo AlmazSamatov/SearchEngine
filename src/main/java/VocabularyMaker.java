@@ -1,5 +1,4 @@
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -16,7 +15,7 @@ public class VocabularyMaker {
         FileSystem fileSystem = FileSystem.get(configuration);
 
         Map<String, Integer> wordIds = new HashMap<>();
-        Map<Integer, Integer> idf = new HashMap<>();
+        Map<String, Integer> idf = new HashMap<>();
 
         FileStatus[] fileStatus = fileSystem.listStatus(new Path("hdfs://namenode:9000/user/team6/" + wordIdsDir));
         for (FileStatus status : fileStatus) {
@@ -27,20 +26,18 @@ public class VocabularyMaker {
             }
         }
 
-        fileStatus = fileSystem.listStatus(new Path("hdfs://namenode:9000/user/team6/idf" + idfDir));
+        fileStatus = fileSystem.listStatus(new Path("hdfs://namenode:9000/user/team6/" + idfDir));
         for (FileStatus status : fileStatus) {
             try (Scanner scanner = new Scanner(fileSystem.open(status.getPath()))) {
                 while (scanner.hasNext()) {
-                    idf.put(scanner.nextInt(), scanner.nextInt());
+                    idf.put(scanner.next(), scanner.nextInt());
                 }
             }
         }
 
         Vocabulary vocabulary = new Vocabulary(wordIds, idf);
 
-        try (FSDataOutputStream outputStream = fileSystem.create(new Path("hdfs://namenode:9000/user/team6/vocabulary"))) {
-            vocabulary.write(outputStream);
-        }
+        Vocabulary.writeVocabularyToFile(vocabulary, pathToWrite);
     }
 
     public static void main(String[] args) throws IOException {

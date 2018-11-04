@@ -1,12 +1,12 @@
 import com.google.gson.Gson;
-import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Map;
 
-public class DocVector implements Writable {
+public class DocVector implements WritableComparable<DocVector> {
     private int docId;
     private Map<Integer, Double> vector;
 
@@ -29,7 +29,7 @@ public class DocVector implements Writable {
     public void write(DataOutput dataOutput) throws IOException {
         Gson gson = new Gson();
         String serializedDocVector = gson.toJson(this);
-        dataOutput.writeUTF(serializedDocVector);
+        dataOutput.writeChars(serializedDocVector);
     }
 
     @Override
@@ -55,5 +55,16 @@ public class DocVector implements Writable {
 
     public void setVector(Map<Integer, Double> vector) {
         this.vector = vector;
+    }
+
+    @Override
+    public int compareTo(DocVector o) {
+        return 0;
+    }
+
+    @Override
+    public String toString() {
+        Gson gson = new Gson();
+        return gson.toJson(this);
     }
 }
