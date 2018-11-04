@@ -1,3 +1,4 @@
+import com.google.gson.Gson;
 import org.apache.hadoop.io.WritableComparable;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,20 +38,19 @@ public class Document implements WritableComparable<Document> {
 
     @Override
     public void write(DataOutput dataOutput) throws IOException {
-        dataOutput.writeInt(id);
-        dataOutput.writeUTF(title);
-        dataOutput.writeUTF(url);
-        dataOutput.writeUTF(text);
-        dataOutput.writeDouble(relevance);
+        Gson gson = new Gson();
+        dataOutput.writeChars(gson.toJson(this));
     }
 
     @Override
     public void readFields(DataInput dataInput) throws IOException {
-        id = dataInput.readInt();
-        title = dataInput.readUTF();
-        url = dataInput.readUTF();
-        text = dataInput.readUTF();
-        relevance = dataInput.readDouble();
+        Gson gson = new Gson();
+        Document document = gson.fromJson(dataInput.readLine(), Document.class);
+        id = document.id;
+        title = document.title;
+        text = document.text;
+        url = document.url;
+        relevance = document.relevance;
     }
 
     @Override
