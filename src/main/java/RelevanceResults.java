@@ -37,7 +37,7 @@ public class RelevanceResults implements WritableComparable<RelevanceResults> {
 
     @Override
     public int compareTo(RelevanceResults o) {
-        return Double.compare(relevance.get(), o.relevance.get());
+        return Double.compare(o.relevance.get(), relevance.get());
     }
 
     @Override
