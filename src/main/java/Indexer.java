@@ -1,6 +1,8 @@
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.*;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
@@ -25,8 +27,8 @@ public class Indexer {
         job.setJarByClass(Indexer.class);
         job.setMapperClass(Indexer.IndexMap.class);
         job.setNumReduceTasks(0);
-        job.setOutputKeyClass(IntWritable.class);
-        job.setOutputValueClass(DoubleWritable.class);
+        job.setOutputKeyClass(DocVector.class);
+        job.setOutputValueClass(NullWritable.class);
         for (int i = 0; i < args.length - 2; i++) {
             MultipleInputs.addInputPath(job, new Path(args[i]), TextInputFormat.class);
         }
@@ -66,11 +68,9 @@ public class Indexer {
 
             Map<Integer, Double> result = new HashMap<>();
             for (Map.Entry<String, Integer> entry : vocabulary.getIdf().entrySet()) {
-                Integer wordId = vocabulary.getWordIds().get(entry.getKey());
-                assert wordId != null;
-                assert wordMap.get(wordId) != null;
-                assert entry.getValue() != null;
-                result.put(wordId, (double) (wordMap.get(wordId) / entry.getValue()));
+                Integer wordId = wordIds.get(entry.getKey());
+                if (wordMap.get(wordId) != null)
+                    result.put(wordId, (double) (wordMap.get(wordId) / entry.getValue()));
             }
             context.write(new DocVector(document.getId(), result), NullWritable.get());
 
