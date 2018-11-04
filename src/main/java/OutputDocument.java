@@ -45,17 +45,16 @@ public class OutputDocument implements WritableComparable<OutputDocument> {
 
     @Override
     public void write(DataOutput dataOutput) throws IOException {
-        Gson gson = new Gson();
-        dataOutput.writeUTF(gson.toJson(this));
+        dataOutput.writeUTF(title);
+        dataOutput.writeUTF(url);
+        dataOutput.writeDouble(relevance);
     }
 
     @Override
     public void readFields(DataInput dataInput) throws IOException {
-        Gson gson = new Gson();
-        OutputDocument document = gson.fromJson(dataInput.readLine(), OutputDocument.class);
-        title = document.title;
-        url = document.url;
-        relevance = document.relevance;
+        title = dataInput.readUTF();
+        url = dataInput.readUTF();
+        relevance = dataInput.readDouble();
     }
 
     @Override
