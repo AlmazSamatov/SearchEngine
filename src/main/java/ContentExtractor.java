@@ -50,7 +50,7 @@ public class ContentExtractor {
         return results;
     }
 
-    public static class ContentExtractorMapper extends Mapper<LongWritable, Text, Document, NullWritable> {
+    public static class ContentExtractorMapper extends Mapper<LongWritable, Text, OutputDocument, NullWritable> {
 
         private static Map<Integer, Double> results = new HashMap<>();
 
@@ -72,7 +72,7 @@ public class ContentExtractor {
             Double relevance = results.get(document.getId());
 
             if (relevance != null) {
-                context.write(document, NullWritable.get());
+                context.write(new OutputDocument(document), NullWritable.get());
             }
         }
     }
@@ -114,7 +114,7 @@ public class ContentExtractor {
         job.setMapperClass(ContentExtractorMapper.class);
         job.setSortComparatorClass(ContentExtractorResultsComparator.class);
         job.setReducerClass(ContentExtractorReducer.class);
-        job.setOutputKeyClass(Document.class);
+        job.setOutputKeyClass(OutputDocument.class);
         job.setOutputValueClass(NullWritable.class);
         for (int i = 0; i < args.length - 2; i++) {
             MultipleInputs.addInputPath(job, new Path(args[i]), TextInputFormat.class);
