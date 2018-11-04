@@ -40,7 +40,7 @@ public class ContentExtractor {
                     while (inputStream.available() > 0) {
                         RelevanceResults relevanceResults = new RelevanceResults();
                         relevanceResults.readFields(inputStream);
-                        results.put(relevanceResults.getPrimaryField().get(), relevanceResults.getSecondaryField().get());
+                        results.put(relevanceResults.getDocId().get(), relevanceResults.getRelevance().get());
                     }
                 }
             }

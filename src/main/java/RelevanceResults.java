@@ -8,48 +8,48 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public class RelevanceResults implements WritableComparable<RelevanceResults> {
-    private IntWritable primaryField = new IntWritable();
-    private DoubleWritable secondaryField = new DoubleWritable();
+    private IntWritable docId = new IntWritable();
+    private DoubleWritable relevance = new DoubleWritable();
 
-    public IntWritable getPrimaryField() {
-        return primaryField;
+    public IntWritable getDocId() {
+        return docId;
     }
 
-    public void setPrimaryField(IntWritable primaryField) {
-        this.primaryField = primaryField;
+    public void setDocId(IntWritable docId) {
+        this.docId = docId;
     }
 
-    public DoubleWritable getSecondaryField() {
-        return secondaryField;
+    public DoubleWritable getRelevance() {
+        return relevance;
     }
 
-    public void setSecondaryField(DoubleWritable secondaryField) {
-        this.secondaryField = secondaryField;
+    public void setRelevance(DoubleWritable relevance) {
+        this.relevance = relevance;
     }
 
     RelevanceResults() {
     }
 
     RelevanceResults(int key, double value) {
-        primaryField.set(key);
-        secondaryField.set(value);
+        docId.set(key);
+        relevance.set(value);
     }
 
     @Override
     public int compareTo(RelevanceResults o) {
-        return Double.compare(secondaryField.get(), o.secondaryField.get());
+        return Double.compare(relevance.get(), o.relevance.get());
     }
 
     @Override
     public void write(DataOutput dataOutput) throws IOException {
-        primaryField.write(dataOutput);
-        secondaryField.write(dataOutput);
+        docId.write(dataOutput);
+        relevance.write(dataOutput);
     }
 
     @Override
     public void readFields(DataInput dataInput) throws IOException {
-        primaryField.readFields(dataInput);
-        secondaryField.readFields(dataInput);
+        docId.readFields(dataInput);
+        relevance.readFields(dataInput);
     }
 
     @Override

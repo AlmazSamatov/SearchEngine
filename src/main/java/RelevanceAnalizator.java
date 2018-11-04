@@ -30,9 +30,9 @@ public class RelevanceAnalizator {
 
                 if (docVector.getVector().containsKey(entry.getKey())) {
                     relevance += docVector.getVector().get(entry.getKey()) * entry.getValue();
+                    context.write(new RelevanceResults(entry.getKey(), relevance), NullWritable.get());
                 }
 
-                context.write(new RelevanceResults(entry.getKey(), relevance), NullWritable.get());
             }
 
         }
