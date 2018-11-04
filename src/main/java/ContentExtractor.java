@@ -50,7 +50,7 @@ public class ContentExtractor {
         return results;
     }
 
-    public static class ContentExtractorMapper extends Mapper<LongWritable, Text, OutputDocument, NullWritable> {
+    public static class ContentExtractorMapper extends Mapper<LongWritable, Text, Document, NullWritable> {
 
         private static Map<Integer, Double> results = new HashMap<>();
 
@@ -72,29 +72,29 @@ public class ContentExtractor {
             Double relevance = results.get(document.getId());
 
             if (relevance != null) {
-                context.write(new OutputDocument(document), NullWritable.get());
+                context.write(document, NullWritable.get());
             }
         }
     }
 
-    public static class ContentExtractorReducer extends Reducer<Document, NullWritable, Document, NullWritable> {
+    public static class ContentExtractorReducer extends Reducer<Document, NullWritable, OutputDocument, NullWritable> {
 
         @Override
         protected void reduce(Document key, Iterable<NullWritable> values, Context context) throws IOException, InterruptedException {
-            context.write(key, NullWritable.get());
+            context.write(new OutputDocument(key), NullWritable.get());
         }
     }
 
     public static class ContentExtractorResultsComparator extends WritableComparator {
 
         protected ContentExtractorResultsComparator() {
-            super(Document.class, true);
+            super(OutputDocument.class, true);
         }
 
         @Override
         public int compare(Object a, Object b) {
-            Document d1 = (Document) a;
-            Document d2 = (Document) b;
+            OutputDocument d1 = (OutputDocument) a;
+            OutputDocument d2 = (OutputDocument) b;
             return d1.compareTo(d2);
         }
     }

@@ -13,7 +13,7 @@ public class OutputDocument implements WritableComparable<OutputDocument> {
 
     OutputDocument(Document d){
         title = d.getTitle();
-        url = d.getUrl();
+        url = d.getUrl() + String.valueOf(d.getId());
         relevance = d.getRelevance();
     }
 
