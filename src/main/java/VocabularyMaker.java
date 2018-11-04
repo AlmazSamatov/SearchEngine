@@ -38,7 +38,7 @@ public class VocabularyMaker {
 
         Vocabulary vocabulary = new Vocabulary(wordIds, idf);
 
-        try (FSDataOutputStream outputStream = fileSystem.create(new Path("hdfs://namenode:9000/user/team6/vocabulary"))) {
+        try (FSDataOutputStream outputStream = fileSystem.create(new Path("hdfs://namenode:9000/user/team6/" + vocabulary))) {
             vocabulary.write(outputStream);
         }
     }
