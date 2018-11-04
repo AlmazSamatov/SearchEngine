@@ -47,8 +47,7 @@ public class RelevanceAnalizator {
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-        QueryVectorizer queryVectorizer = new QueryVectorizer();
-        queryVector = queryVectorizer.convertQueryToVector(args[0], args[3]);
+        queryVector = QueryVectorizer.convertQueryToVector(args[0], args[3]);
 
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "relevance analizator");

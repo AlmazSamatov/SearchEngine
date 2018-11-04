@@ -15,7 +15,7 @@ public class QueryVectorizer {
      * @param query query
      * @return map containing word IDs present in query as keys and their TF/IDF values as values.
      */
-    public Map<Integer, Double> convertQueryToVector(String query, String vocDir) throws IOException {
+    public static Map<Integer, Double> convertQueryToVector(String query, String vocDir) throws IOException {
         Vocabulary vocabulary = Vocabulary.readVocabulary(vocDir);
 
         Map<Integer, Double> wordsInQuery = new HashMap<>();
