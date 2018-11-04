@@ -1,3 +1,4 @@
+import com.google.gson.Gson;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.WritableComparable;
@@ -26,7 +27,8 @@ public class RelevanceResults implements WritableComparable<RelevanceResults> {
         this.secondaryField = secondaryField;
     }
 
-    RelevanceResults() {}
+    RelevanceResults() {
+    }
 
     RelevanceResults(int key, double value) {
         primaryField.set(key);
@@ -48,5 +50,11 @@ public class RelevanceResults implements WritableComparable<RelevanceResults> {
     public void readFields(DataInput dataInput) throws IOException {
         primaryField.readFields(dataInput);
         secondaryField.readFields(dataInput);
+    }
+
+    @Override
+    public String toString() {
+        Gson gson = new Gson();
+        return gson.toJson(this);
     }
 }
