@@ -69,10 +69,10 @@ public class ContentExtractor {
         @Override
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
             Document document = new Document(value.toString());
-            document.setRelevance(results.get(document.getId()));
             Double relevance = results.get(document.getId());
 
             if (relevance != null) {
+                document.setRelevance(results.get(document.getId()));
                 context.write(new OutputDocument(document), NullWritable.get());
             }
         }
