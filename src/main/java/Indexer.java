@@ -6,6 +6,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -35,7 +36,12 @@ public class Indexer {
 
     public static class IndexMap extends Mapper<LongWritable, Text, DocVector, NullWritable> {
         public void map(LongWritable offset, Text doc, Context context) throws IOException, InterruptedException {
-            Document document = new Document(new JSONObject(doc.toString()));
+            Document document = new Document();
+            try {
+                document = new Document(new JSONObject(doc.toString()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
             Map<Integer, Integer> wordMap = new HashMap<>();
             Map<String, Integer> wordIds = vocabulary.getWordIds();
