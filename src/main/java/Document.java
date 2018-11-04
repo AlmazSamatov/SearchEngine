@@ -1,7 +1,5 @@
 import com.google.gson.Gson;
 import org.apache.hadoop.io.WritableComparable;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -19,21 +17,13 @@ public class Document implements WritableComparable<Document> {
     }
 
     Document(String serialized) {
-        try {
-            JSONObject jsonObject = new JSONObject(serialized);
-            if (jsonObject.has("id"))
-                id = jsonObject.getInt("id");
-            if (jsonObject.has("title"))
-                title = jsonObject.getString("title");
-            if (jsonObject.has("url"))
-                url = jsonObject.getString("url");
-            if (jsonObject.has("text"))
-                text = jsonObject.getString("text");
-            if (jsonObject.has("relevance"))
-                relevance = jsonObject.getDouble("relevance");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        Gson gson = new Gson();
+        Document document = gson.fromJson(serialized, Document.class);
+        id = document.id;
+        title = document.title;
+        text = document.text;
+        url = document.url;
+        relevance = document.relevance;
     }
 
     @Override
