@@ -59,7 +59,6 @@ public class RelevanceAnalizator {
             query.append(args[i]);
         }
         Map<Integer, Double> queryVector = QueryVectorizer.convertQueryToVector(query.toString(), args[1]);
-        System.out.println(queryVector);
 
         Configuration conf = new Configuration();
         conf.set("queryVector", QueryVectorizer.serialize(queryVector));
