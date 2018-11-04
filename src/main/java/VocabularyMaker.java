@@ -16,7 +16,7 @@ public class VocabularyMaker {
         FileSystem fileSystem = FileSystem.get(configuration);
 
         Map<String, Integer> wordIds = new HashMap<>();
-        Map<Integer, Integer> idf = new HashMap<>();
+        Map<String, Integer> idf = new HashMap<>();
 
         FileStatus[] fileStatus = fileSystem.listStatus(new Path("hdfs://namenode:9000/user/team6/" + wordIdsDir));
         for (FileStatus status : fileStatus) {
@@ -31,7 +31,7 @@ public class VocabularyMaker {
         for (FileStatus status : fileStatus) {
             try (Scanner scanner = new Scanner(fileSystem.open(status.getPath()))) {
                 while (scanner.hasNext()) {
-                    idf.put(scanner.nextInt(), scanner.nextInt());
+                    idf.put(scanner.next(), scanner.nextInt());
                 }
             }
         }
