@@ -8,7 +8,6 @@ import org.apache.hadoop.io.Writable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -64,16 +63,9 @@ public class Vocabulary implements Writable {
 
         Vocabulary vocabulary = new Vocabulary();
 
-        File dir = new File(vocDir);
-        File[] directoryListing = dir.listFiles();
-        if (directoryListing != null) {
-            for (File child : directoryListing) {
-                if (child.getName().charAt(0) != '_') {
-                    try (FSDataInputStream inputStream = fileSystem.open(new Path(child.getPath().toString()))) {
-                        vocabulary.readFields(inputStream);
-                    }
-                }
-            }
+
+        try (FSDataInputStream inputStream = fileSystem.open(new Path(vocDir))) {
+            vocabulary.readFields(inputStream);
         }
 
         return vocabulary;
