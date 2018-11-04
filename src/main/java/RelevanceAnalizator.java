@@ -11,9 +11,15 @@ import java.util.Map;
 
 public class RelevanceAnalizator {
 
-    private static Map<Integer, Double> queryVector;
-
     public static class RelevanceMapper extends Mapper<LongWritable, Text, RelevanceResults, NullWritable> {
+
+        private static Map<Integer, Double> queryVector;
+
+        @Override
+        protected void setup(Context context) throws IOException, InterruptedException {
+            super.setup(context);
+            queryVector = QueryVectorizer.deserialize(context.getConfiguration().get("queryVector"));
+        }
 
         public void map(LongWritable offset, Text doc, Context context) throws IOException, InterruptedException {
             DocVector docVector = new DocVector(doc.toString());
@@ -47,9 +53,10 @@ public class RelevanceAnalizator {
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-        queryVector = QueryVectorizer.convertQueryToVector(args[0], args[3]);
+        Map<Integer, Double> queryVector = QueryVectorizer.convertQueryToVector(args[0], args[3]);
 
         Configuration conf = new Configuration();
+        conf.set("queryVector", QueryVectorizer.serialize(queryVector));
         Job job = Job.getInstance(conf, "relevance analizator");
         job.setJarByClass(RelevanceAnalizator.class);
         job.setMapperClass(RelevanceMapper.class);

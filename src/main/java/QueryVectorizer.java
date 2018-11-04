@@ -1,3 +1,6 @@
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +11,16 @@ import java.util.StringTokenizer;
  * and TF/IDF values as values.
  */
 public class QueryVectorizer {
+
+    public static Map<Integer, Double> deserialize(String s) {
+        Gson gson = new Gson();
+        return gson.fromJson(s, new TypeToken<Map<Integer, Double>>() {}.getType());
+    }
+
+    public static String serialize(Map<Integer, Double> m) {
+        Gson gson = new Gson();
+        return gson.toJson(m);
+    }
 
     /**
      * This method converts string query to map.
