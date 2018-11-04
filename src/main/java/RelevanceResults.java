@@ -41,14 +41,16 @@ public class RelevanceResults implements WritableComparable<RelevanceResults> {
 
     @Override
     public void write(DataOutput dataOutput) throws IOException {
-        dataOutput.writeInt(docId);
-        dataOutput.writeDouble(relevance);
+        Gson gson = new Gson();
+        dataOutput.writeChars(gson.toJson(this));
     }
 
     @Override
     public void readFields(DataInput dataInput) throws IOException {
-        docId = dataInput.readInt();
-        relevance = dataInput.readDouble();
+        Gson gson = new Gson();
+        RelevanceResults relevanceResults = gson.fromJson(dataInput.readLine(), RelevanceResults.class);
+        docId = relevanceResults.docId;
+        relevance = relevanceResults.relevance;
     }
 
     @Override
