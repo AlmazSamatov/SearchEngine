@@ -29,7 +29,7 @@ public class DocVector implements Writable {
     public void write(DataOutput dataOutput) throws IOException {
         Gson gson = new Gson();
         String serializedDocVector = gson.toJson(this);
-        dataOutput.writeUTF(serializedDocVector);
+        dataOutput.writeChars(serializedDocVector);
     }
 
     @Override
