@@ -70,7 +70,7 @@ public class Indexer {
 
             for (Map.Entry<String, Integer> entry : wordMap.entrySet()) {
                 Integer wordId = wordIds.get(entry.getKey());
-                result.put(wordId, (double) (entry.getValue() / idf.get(entry.getKey())));
+                result.put(wordId, (double) entry.getValue() / (double) idf.get(entry.getKey()));
             }
 
             context.write(new DocVector(document.getId(), result), NullWritable.get());
