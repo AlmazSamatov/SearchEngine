@@ -65,7 +65,6 @@ public class DocVector implements WritableComparable<DocVector> {
     @Override
     public String toString() {
         Gson gson = new Gson();
-        String serializedDocVector = gson.toJson(this);
-        return serializedDocVector;
+        return gson.toJson(this);
     }
 }

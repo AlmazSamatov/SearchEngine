@@ -15,7 +15,6 @@ import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class ContentExtractor {
 
         FileStatus[] status = fileSystem.listStatus(new Path("hdfs://namenode:9000/user/team6/" + relevanceDir));
 
-        for (FileStatus child: status) {
+        for (FileStatus child : status) {
             if (child.getPath().getName().charAt(0) != '_') {
                 try (FSDataInputStream inputStream = fileSystem.open(child.getPath())) {
                     while (inputStream.available() > 0) {
@@ -62,7 +61,8 @@ public class ContentExtractor {
 
         private static Map<Integer, Double> deserializeResults(String s) {
             Gson gson = new Gson();
-            return gson.fromJson(s, new TypeToken<Map<Integer, Double>>() {}.getType());
+            return gson.fromJson(s, new TypeToken<Map<Integer, Double>>() {
+            }.getType());
         }
 
         @Override
