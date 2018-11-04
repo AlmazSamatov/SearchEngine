@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 public class Indexer {
-    
+
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
         System.out.println("Start reading vocabulary...");
         Vocabulary vocabulary = Vocabulary.readVocabulary(args[args.length - 2]);
@@ -67,6 +67,9 @@ public class Indexer {
             Map<Integer, Double> result = new HashMap<>();
             for (Map.Entry<String, Integer> entry : vocabulary.getIdf().entrySet()) {
                 Integer wordId = vocabulary.getWordIds().get(entry.getKey());
+                assert wordId != null;
+                assert wordMap.get(wordId) != null;
+                assert entry.getValue() != null;
                 result.put(wordId, (double) (wordMap.get(wordId) / entry.getValue()));
             }
             context.write(new DocVector(document.getId(), result), NullWritable.get());
