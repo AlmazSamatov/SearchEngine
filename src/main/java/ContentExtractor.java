@@ -11,6 +11,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparator;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -40,7 +41,7 @@ public class ContentExtractor {
                     while (inputStream.available() > 0) {
                         RelevanceResults relevanceResults = new RelevanceResults();
                         relevanceResults.readFields(inputStream);
-                        results.put(relevanceResults.getDocId().get(), relevanceResults.getRelevance().get());
+                        results.put(relevanceResults.getDocId(), relevanceResults.getRelevance());
                     }
                 }
             }
@@ -76,6 +77,14 @@ public class ContentExtractor {
         }
     }
 
+    public static class ContentExtractorReducer extends Reducer<Document, NullWritable, Document, NullWritable> {
+
+        @Override
+        protected void reduce(Document key, Iterable<NullWritable> values, Context context) throws IOException, InterruptedException {
+            context.write(key, NullWritable.get());
+        }
+    }
+
     public static class ContentExtractorResultsComparator extends WritableComparator {
 
         protected ContentExtractorResultsComparator() {
@@ -104,7 +113,7 @@ public class ContentExtractor {
         job.setJarByClass(ContentExtractor.class);
         job.setMapperClass(ContentExtractorMapper.class);
         job.setSortComparatorClass(ContentExtractorResultsComparator.class);
-        job.setNumReduceTasks(0);
+        job.setReducerClass(ContentExtractorReducer.class);
         job.setOutputKeyClass(Document.class);
         job.setOutputValueClass(NullWritable.class);
         for (int i = 0; i < args.length - 2; i++) {

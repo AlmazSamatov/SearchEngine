@@ -9,7 +9,24 @@ public class RelevanceResults implements WritableComparable<RelevanceResults> {
     private int docId;
     private double relevance;
 
+    public int getDocId() {
+        return docId;
+    }
+
+    public double getRelevance() {
+        return relevance;
+    }
+
+    public void setRelevance(double relevance) {
+        this.relevance = relevance;
+    }
+
+    public void setDocId(int docId) {
+        this.docId = docId;
+    }
+
     RelevanceResults() {
+
     }
 
     RelevanceResults(int key, double value) {
