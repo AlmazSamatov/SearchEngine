@@ -13,14 +13,14 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 public class Indexer {
-    private static Vocabulary vocabulary;
-
+    
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
         System.out.println("Start reading vocabulary...");
-        vocabulary = Vocabulary.readVocabulary(args[args.length - 2]);
+        Vocabulary vocabulary = Vocabulary.readVocabulary(args[args.length - 2]);
         System.out.println("Vocabulary read ended...");
 
         Configuration conf = new Configuration();
+        conf.set("vocabulary", vocabulary.serialize());
         Job job = Job.getInstance(conf, "indexing");
         job.setJarByClass(Indexer.class);
         job.setMapperClass(Indexer.IndexMap.class);
@@ -35,6 +35,15 @@ public class Indexer {
     }
 
     public static class IndexMap extends Mapper<LongWritable, Text, DocVector, NullWritable> {
+
+        private static Vocabulary vocabulary;
+
+        @Override
+        protected void setup(Context context) throws IOException, InterruptedException {
+            super.setup(context);
+            vocabulary = Vocabulary.deserialize(context.getConfiguration().get("vocabulary"));
+        }
+
         public void map(LongWritable offset, Text doc, Context context) throws IOException, InterruptedException {
             Document document = new Document(doc.toString());
 

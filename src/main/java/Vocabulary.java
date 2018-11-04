@@ -57,9 +57,11 @@ public class Vocabulary implements Writable {
         try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)))) {
             Gson gson = new Gson();
             String serializedWordIds = bufferedReader.readLine();
-            vocabulary.setWordIds(gson.fromJson(serializedWordIds, new TypeToken<Map<String, Integer>>() {}.getType()));
+            vocabulary.setWordIds(gson.fromJson(serializedWordIds, new TypeToken<Map<String, Integer>>() {
+            }.getType()));
             String serializedIdf = bufferedReader.readLine();
-            vocabulary.setIdf(gson.fromJson(serializedIdf, new TypeToken<Map<String, Integer>>() {}.getType()));
+            vocabulary.setIdf(gson.fromJson(serializedIdf, new TypeToken<Map<String, Integer>>() {
+            }.getType()));
         }
 
         return vocabulary;
@@ -71,5 +73,15 @@ public class Vocabulary implements Writable {
             printWriter.println(gson.toJson(vocabulary.getWordIds()));
             printWriter.println(gson.toJson(vocabulary.getIdf()));
         }
+    }
+
+    public String serialize() {
+        Gson gson = new Gson();
+        return gson.toJson(this);
+    }
+
+    public static Vocabulary deserialize(String s) {
+        Gson gson = new Gson();
+        return gson.fromJson(s, Vocabulary.class);
     }
 }
